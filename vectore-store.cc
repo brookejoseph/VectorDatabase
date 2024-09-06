@@ -14,17 +14,42 @@ public:
 
 class VectorStore
 {
+    float euclideanDistance(const std::vector<float> &vec1, const std::vector<float> &vec2)
+    {
+        float sum = 0.0;
+        for (size_t i = 0; i < vec1.size(); ++i)
+        {
+            sum += (vec1[i] - vec2[i]) * (vec1[i] - vec2[i]);
+        }
+        return std::sqrt(sum);
+    }
+
 private:
     std::vector<Vector> vectors;
 
 public:
-    // Method to add a vector to the store
     void addVector(const Vector &vec)
     {
         vectors.push_back(vec);
     }
 
-    // Method to retrieve a vector by its ID
+    Vector *findClosestVector(const std::vector<float> &query)
+    {
+        Vector *closestVector = nullptr;
+        float minDistance = std::numeric_limits<float>::max();
+
+        for (auto &vec : vectors)
+        {
+            float dist = euclideanDistance(vec.values, query);
+            if (dist < minDistance)
+            {
+                minDistance = dist;
+                closestVector = &vec;
+            }
+        }
+        return closestVector;
+    }
+
     Vector *getVectorById(int id)
     {
         for (auto &vec : vectors)
@@ -34,10 +59,9 @@ public:
                 return &vec;
             }
         }
-        return nullptr; // return null if not found
+        return nullptr;
     }
 
-    // Optional: method to print vectors (for debugging purposes)
     void printVectors()
     {
         for (const auto &vec : vectors)
